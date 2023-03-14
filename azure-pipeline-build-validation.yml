@@ -1,0 +1,13 @@
+trigger:
+- none
+
+pr:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: |
+    npx --yes docker4gis@latest build
+  displayName: 'docker4gis build'

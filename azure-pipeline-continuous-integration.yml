@@ -1,0 +1,31 @@
+trigger:
+- main
+
+pr:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: |
+    git remote set-url origin https://merkatorgis:$(GITHUB_PASSWORD)@github.com/merkatorgis/docker4gis-postgis.git
+  displayName: 'git login'
+
+- script: |
+    echo '$(DOCKER_PASSWORD)' | docker login -u=docker4gis --password-stdin docker.io
+  displayName: 'docker login'
+#
+- script: |
+    git config --global user.email 'pipeline@azure.com'
+    git config --global user.name 'Azure Pipeline'
+  displayName: 'git config'
+
+- script: |
+    git checkout -b main
+    git push --set-upstream origin main
+  displayName: 'git undo detached state'
+  
+- script: |
+    npx --yes docker4gis@latest push
+  displayName: 'docker4gis push'
