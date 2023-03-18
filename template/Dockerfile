@@ -1,4 +1,4 @@
-FROM docker4gis/postgis:v0.0.1
+FROM docker4gis/postgis:v0.0.2
 
 ENV POSTFIX_DOMAIN=template.example.com
 
