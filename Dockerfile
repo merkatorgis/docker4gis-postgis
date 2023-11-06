@@ -9,6 +9,7 @@ ARG POSTGIS_VERSION
 # postgis/postgis:13-3.3 <- debian:bullseye = 11
 # postgis/postgis:14-3.3 <- debian:bullseye = 11
 # postgis/postgis:15-3.3 <- debian:bullseye = 11
+# postgis/postgis:16-3.4 <- debian:bullseye = 11
 FROM postgis/postgis:${POSTGRESQL_VERSION}-${POSTGIS_VERSION}
 
 # https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact
@@ -51,19 +52,10 @@ ARG MYSQL_VERSION
 ENV MYSQL_VERSION=${MYSQL_VERSION}
 # https://dev.mysql.com/get/mysql-apt-config_0.8.16-1_all.deb
 COPY conf/src/mysql-apt-config_${MYSQL_VERSION}_all.deb /
-# hard downloaded archived debian9 version (postgis 10-2.5), since apt support
-# for debian9 is dropped
-COPY conf/src/mysql-connector-odbc-debian-9 /mysql-connector-odbc
-RUN . /etc/os-release; \
-    if [ "$VERSION_ID" = 9 ]; then \
-    cp /mysql-connector-odbc/bin/* /usr/bin; \
-    cp /mysql-connector-odbc/lib/* /usr/lib/x86_64-linux-gnu/odbc; \
-    else \
-    apt install -y lsb-release wget; \
+RUN apt install -y lsb-release wget; \
     dpkg -i /mysql-apt-config_${MYSQL_VERSION}_all.deb; \
     apt update; \
-    apt install -y mysql-connector-odbc; \
-    fi
+    apt install -y mysql-connector-odbc;
 # install proper paths to the odbc drivers
 RUN template=$(mktemp); \
     add() { echo "$1" >> "$template"; }; \
@@ -133,6 +125,7 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 RUN curl https://packages.microsoft.com/config/debian/$(cut -d. -f1 /etc/debian_version)/prod.list \
     > /etc/apt/sources.list.d/mssql-release.list
 RUN apt-get update; \
+    ACCEPT_EULA=Y apt-get install -y msodbcsql18 || \
     ACCEPT_EULA=Y apt-get install -y msodbcsql17
 # optional: for bcp and sqlcmd
 RUN ACCEPT_EULA=Y apt-get install -y mssql-tools; \
@@ -205,6 +198,9 @@ COPY conf/mail /tmp/mail
 
 # install source for schema web
 COPY conf/web /tmp/web
+
+# install source for schema admin
+COPY conf/admin /tmp/admin
 
 # install database server administrative scripts
 COPY ["conf/entrypoint", "conf/conf.sh", "conf/onstart.sh", "conf/subconf.sh", "/"]

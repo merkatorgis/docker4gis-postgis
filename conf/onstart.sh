@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# run.sh waits until this is true
-pg.sh -c "alter database $POSTGRES_DB set app.ddl_done to false"
-
 extension() {
     pg.sh -c "create extension if not exists $1"
 }
@@ -19,8 +16,10 @@ restore
 # run the DDL to either provision the database from scratch, or migrate the
 # existing database to the latest version
 time {
-    # maybe this image contains a newer (minor, updatable without dump &
-    # restore) version of PostGIS than the last image that served this database
+    # Maybe this image contains a newer (minor, updatable without dump &
+    # restore) version of PostGIS than the last image that served this database.
+    # See
+    # https://github.com/postgis/docker-postgis/blob/master/update-postgis.sh
     update-postgis.sh
 
     extension ogr_fdw
@@ -37,6 +36,7 @@ time {
 
     /subconf.sh /tmp/mail/conf.sh
     /subconf.sh /tmp/web/conf.sh
+    /subconf.sh /tmp/admin/conf.sh
 
     # This corresponds to the Dockerfile's ONBUILD COPY conf /tmp/conf
     find /tmp/conf -name "conf.sh" -exec /subconf.sh {} \;
