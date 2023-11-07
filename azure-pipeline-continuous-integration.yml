@@ -27,5 +27,5 @@ steps:
   displayName: 'git undo detached state'
   
 - script: |
-    npx --yes docker4gis@latest push
-  displayName: 'docker4gis push'
+    npx --yes docker4gis@latest push 16 3.4
+  displayName: 'docker4gis push 16 3.4'
