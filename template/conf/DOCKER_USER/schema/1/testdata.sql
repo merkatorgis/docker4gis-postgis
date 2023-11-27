@@ -3,7 +3,7 @@ select new_user
     , true
     );
 
-set session request.jwt.claim.email = 'a@b.c';
+set session request.jwt.claims = '{"email": "a@b.c"}';
 select save_password
     ( 'a@b.c'
     , 'abc'
@@ -34,7 +34,7 @@ select new_user
     , true
     );
 
-set session request.jwt.claim.email = 'aa@bb.cc';
+set session request.jwt.claims = '{"email": "aa@bb.cc"}';
 select save_password
     ( 'aa@bb.cc'
     , 'aabbcc'
