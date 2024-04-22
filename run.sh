@@ -11,7 +11,6 @@ CONTAINER=$CONTAINER
 DOCKER_ENV=$DOCKER_ENV
 RESTART=$RESTART
 NETWORK=$NETWORK
-IP=$IP
 FILEPORT=$FILEPORT
 RUNNER=$RUNNER
 VOLUME=$VOLUME
@@ -29,7 +28,6 @@ docker container run --restart "$RESTART" --name "$CONTAINER" \
 	--mount type=bind,source="$CERTIFICATES",target=/certificates \
 	--mount source="$VOLUME",target=/var/lib/postgresql/data \
 	--network "$NETWORK" \
-	--ip "$IP" \
 	--shm-size="$SHM_SIZE" \
 	-e DOCKER_USER="$DOCKER_USER" \
 	-e SECRET="$SECRET" \
