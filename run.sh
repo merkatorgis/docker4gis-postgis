@@ -30,7 +30,6 @@ docker container run --restart "$RESTART" --name "$CONTAINER" \
 	--network "$NETWORK" \
 	--shm-size="$SHM_SIZE" \
 	-e DOCKER_USER="$DOCKER_USER" \
-	-e SECRET="$SECRET" \
 	-e POSTGRES_LOG_STATEMENT="$POSTGRES_LOG_STATEMENT" \
 	-e "$(docker4gis/noop.sh POSTFIX_DOMAIN "$POSTFIX_DOMAIN")" \
 	-e CONTAINER="$CONTAINER" \
