@@ -69,13 +69,20 @@ dump() {
         start transaction read write;
 
         drop function if exists __restore_settings;
-        create function __restore_settings()
+        create function __restore_settings
+            ( database_name text
+            )
         returns void language plpgsql as \$body\$ begin
     "
     local value
     for setting in app.jwt_secret "$@"; do
         value=$(sql "select current_setting('$setting', true)")
-        settings+="alter database $database set $setting to '$value';"
+        settings+="execute format
+            ( \$format\$
+                alter database %s set $setting to '$value'
+              \$format\$
+            , database_name
+            );"
     done
     settings+="
         -- clean up after ourselves
@@ -151,7 +158,7 @@ restore() {
                 "$backup" 2>"$err"
         fi
         # restore database settings
-        sql "select __restore_settings()"
+        sql "select __restore_settings('$database')"
         # tag the current dump files as done
         tag
         echo "Restored: '$backup.$tag'"
