@@ -4,10 +4,13 @@ trigger:
 pr:
 - main
 
-pool:
-  vmImage: ubuntu-latest
-
-steps:
-- script: |
-    npx --yes docker4gis@latest build
-  displayName: 'docker4gis build'
+stages:
+- stage: pr_stage
+  displayName: Pull Request stage
+  jobs:
+  - job: pr_job
+    displayName: Pull Request job
+    steps:
+    - bash: |
+        npx --yes docker4gis@latest build
+      displayName: docker4gis build
