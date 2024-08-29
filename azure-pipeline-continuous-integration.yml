@@ -4,28 +4,31 @@ trigger:
 pr:
 - none
 
-pool:
-  vmImage: ubuntu-latest
-
-steps:
-- script: |
-    git remote set-url origin https://merkatorgis:$(GITHUB_PASSWORD)@github.com/merkatorgis/docker4gis-postgis.git
-  displayName: 'git login'
-
-- script: |
-    echo '$(DOCKER_PASSWORD)' | docker login -u=docker4gis --password-stdin docker.io
-  displayName: 'docker login'
-#
-- script: |
-    git config --global user.email 'pipeline@azure.com'
-    git config --global user.name 'Azure Pipeline'
-  displayName: 'git config'
-
-- script: |
-    git checkout -b main
-    git push --set-upstream origin main
-  displayName: 'git undo detached state'
-  
-- script: |
-    npx --yes docker4gis@latest push 16 3.4
-  displayName: 'docker4gis push 16 3.4'
+stages:
+- stage: ci_stage
+  displayName: Continuous Integration stage
+  jobs:
+  - job: ci_job
+    displayName: Continuous Integration job
+    steps:
+    - bash: |
+        git remote set-url origin https://merkatorgis:$(GITHUB_PASSWORD)@github.com/merkatorgis/docker4gis-postgis.git
+      displayName: Git login
+    
+    - bash: |
+        echo '$(DOCKER_PASSWORD)' | docker login -u=docker4gis --password-stdin docker.io
+      displayName: Docker login
+    
+    - bash: |
+        git config --global user.email 'pipeline@azure.com'
+        git config --global user.name 'Azure Pipeline'
+      displayName: Git config
+    
+    - bash: |
+        git checkout -b main
+        git push --set-upstream origin main
+      displayName: Git undo detached state
+    
+    - bash: |
+        npx --yes docker4gis@latest push
+      displayName: docker4gis push
