@@ -1,3 +1,5 @@
+# check=skip=InvalidDefaultArgInFrom
+
 ARG POSTGRESQL_VERSION
 ARG POSTGIS_VERSION
 
