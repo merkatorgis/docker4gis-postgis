@@ -1,19 +1,12 @@
 #!/bin/bash
 set -e
 
+[ -z "$POSTFIX_DOMAIN" ] ||
+	echo "POSTFIX_DOMAIN=$POSTFIX_DOMAIN" >>"$ENV_FILE"
+
 SHM_SIZE=${SHM_SIZE:-64m}
-POSTGRES_LOG_STATEMENT=$POSTGRES_LOG_STATEMENT
 
 POSTGIS_PORT=$(docker4gis/port.sh "${POSTGIS_PORT:-5432}")
-
-IMAGE=$IMAGE
-CONTAINER=$CONTAINER
-DOCKER_ENV=$DOCKER_ENV
-RESTART=$RESTART
-NETWORK=$NETWORK
-FILEPORT=$FILEPORT
-RUNNER=$RUNNER
-VOLUME=$VOLUME
 
 CERTIFICATES=$DOCKER_BINDS_DIR/certificates/$DOCKER_USER
 mkdir -p "$CERTIFICATES"
@@ -22,19 +15,16 @@ mkdir -p "$FILEPORT"
 mkdir -p "$RUNNER"
 
 docker container run --restart "$RESTART" --name "$CONTAINER" \
-	-e DOCKER_ENV="$DOCKER_ENV" \
+	--env-file "$ENV_FILE" \
+	--env POSTGRES_LOG_STATEMENT="$POSTGRES_LOG_STATEMENT" \
+	--shm-size="$SHM_SIZE" \
 	--mount type=bind,source="$FILEPORT",target=/fileport \
 	--mount type=bind,source="$RUNNER",target=/runner \
 	--mount type=bind,source="$CERTIFICATES",target=/certificates \
 	--mount source="$VOLUME",target=/var/lib/postgresql/data \
 	--network "$NETWORK" \
-	--shm-size="$SHM_SIZE" \
-	-e DOCKER_USER="$DOCKER_USER" \
-	-e POSTGRES_LOG_STATEMENT="$POSTGRES_LOG_STATEMENT" \
-	-e "$(docker4gis/noop.sh POSTFIX_DOMAIN "$POSTFIX_DOMAIN")" \
-	-e CONTAINER="$CONTAINER" \
-	-p "$POSTGIS_PORT":5432 \
-	-d "$IMAGE" postgis "$@"
+	--publish "$POSTGIS_PORT":5432 \
+	--detach "$IMAGE" postgis "$@"
 
 # Provision the PGDATABASE variable.
 eval "$(docker container exec "$CONTAINER" env | grep PGDATABASE)"
