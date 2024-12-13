@@ -11,6 +11,17 @@ cp "$CONFIG_FILE.template" "$CONFIG_FILE"
 
 [ "$POSTGRES_LOG_STATEMENT" ] && conf log_statement "$POSTGRES_LOG_STATEMENT"
 
+# Process the additional configuration file from the host (possibly containing
+# the output of [PGTune](https://pgtune.leopard.in.ua/)).
+if [ -f /fileport/postgresql.conf ]; then
+	header="#from /fileport/postgresql.conf $(date)"
+	{
+		echo "# Begin $header"
+		cat /fileport/postgresql.conf
+		echo "# End $header"
+	} >>"$CONFIG_FILE"
+fi
+
 # Provision a directory on the Docker host to store generated certificates for
 # reuse by future containers.
 secrets=/fileport/secrets
