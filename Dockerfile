@@ -62,6 +62,7 @@ ENV BUILD_TOOLS="${BUILD_TOOLS} libssl-dev"
 ENV BUILD_TOOLS="${BUILD_TOOLS} libsnappy-dev"
 ENV BUILD_TOOLS="${BUILD_TOOLS} zlib1g-dev"
 ENV BUILD_TOOLS="${BUILD_TOOLS} libzstd-dev"
+ENV BUILD_TOOLS="${BUILD_TOOLS} clang-13"
 RUN apt install -y ${BUILD_TOOLS} \
     wget \
     openssl \
