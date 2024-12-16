@@ -72,7 +72,7 @@ RUN apt install -y ${BUILD_TOOLS} \
 # https://github.com/EnterpriseDB/mongo_fdw/archive/REL-5_2_8.tar.gz
 ADD conf/src/mongo_fdw-REL-${MONGO_FDW_VERSION}.tar.gz /
 RUN cd /mongo_fdw-REL-${MONGO_FDW_VERSION}; \
-    ./autogen.sh --with-master; \
+    ./autogen.sh; \
     export PKG_CONFIG_PATH="$PKG_CONFIG_PATH":/lib/pkgconfig/; \
     make; \
     make install
@@ -145,9 +145,14 @@ ARG ODBC_FDW_VERSION
 ENV ODBC_FDW_VERSION=${ODBC_FDW_VERSION}
 # https://github.com/CartoDB/odbc_fdw/archive/0.5.1.tar.gz
 ADD conf/src/odbc_fdw-${ODBC_FDW_VERSION}.tar.gz /
-RUN cd /odbc_fdw-${ODBC_FDW_VERSION}; \
+# NOTE: odbc_fdw is not compatible with PostgreSQL 17. Project development seems
+# to have stopped (see https://github.com/CartoDB/odbc_fdw). Consider using
+# ogr_fwd instead; see https://gdal.org/en/stable/drivers/vector/odbc.html.
+RUN if [ "$POSTGRESQL_VERSION" -lt 17 ]; then \
+    cd /odbc_fdw-${ODBC_FDW_VERSION}; \
     make; \
-    make install
+    make install; \
+    fi
 
 # remove packages used for building several components
 RUN apt remove -y ${BUILD_TOOLS}; \
