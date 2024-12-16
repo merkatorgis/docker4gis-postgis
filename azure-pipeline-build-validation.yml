@@ -14,3 +14,7 @@ stages:
     - bash: |
         npx --yes docker4gis@latest build
       displayName: docker4gis build
+
+    - bash: |
+        npx --yes docker4gis@latest build 16 3.4
+      displayName: docker4gis build 16 3.4
