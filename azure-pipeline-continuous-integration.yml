@@ -29,10 +29,14 @@ stages:
         git push --set-upstream origin main
       displayName: Git undo detached state
     
+    # Use --no-save, because another push will follow.
     - bash: |
-        npx --yes docker4gis@latest push --no-save
-      displayName: docker4gis push --no-save
+        npx --yes docker4gis@latest push --no-save 16 3.4
+      displayName: docker4gis push --no-save 16 3.4
     
+    # Do provide the default values for the build parameters, so that they're
+    # included in the image's tag. Also, do this one as the last push, so that
+    # this one gets the "latest" tag.
     - bash: |
-        npx --yes docker4gis@latest push 16 3.4
-      displayName: docker4gis push 16 3.4
+        npx --yes docker4gis@latest push 17 3.5
+      displayName: docker4gis push 17 3.5
