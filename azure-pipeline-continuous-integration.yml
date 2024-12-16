@@ -30,9 +30,9 @@ stages:
       displayName: Git undo detached state
     
     - bash: |
-        npx --yes docker4gis@latest push
-      displayName: docker4gis push
+        npx --yes docker4gis@latest push --no-save
+      displayName: docker4gis push --no-save
     
     - bash: |
-        npx --yes docker4gis@latest push --no-save 16 3.4
-      displayName: docker4gis push --no-save 16 3.4
+        npx --yes docker4gis@latest push 16 3.4
+      displayName: docker4gis push 16 3.4
