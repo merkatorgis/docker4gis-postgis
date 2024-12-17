@@ -31,8 +31,8 @@ stages:
     
     # Use --no-save, because another push will follow.
     - bash: |
-        npx --yes docker4gis@latest push --no-save 16 3.4
-      displayName: docker4gis push --no-save 16 3.4
+        npx --yes docker4gis@latest push --no-save 16 3.5
+      displayName: docker4gis push --no-save 16 3.5
     
     # Do provide the default values for the build parameters, so that they're
     # included in the image's tag. Also, do this one as the last push, so that
