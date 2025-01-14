@@ -13,3 +13,6 @@ RUN addmailbox.sh noreply 'Example.com Template Service'
 # E.g. (see https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-PATTERNS):
 # ENV EXCLUDE_SCHEMA=(interpolatie|utils)
 ENV EXCLUDE_SCHEMA=
+
+# On container start, all /tmp/conf/$DOCKER_USER/*/conf.sh scripts are executed.
+COPY conf/$DOCKER_USER /tmp/conf/$DOCKER_USER

@@ -38,8 +38,8 @@ time {
     /subconf.sh /tmp/web/conf.sh
     /subconf.sh /tmp/admin/conf.sh
 
-    # This corresponds to the Dockerfile's ONBUILD COPY conf /tmp/conf
-    find /tmp/conf -name "conf.sh" -exec /subconf.sh {} \;
+    # This corresponds to the Dockerfile's COPY conf/$DOCKER_USER /tmp/conf/$DOCKER_USER.
+    find "/tmp/conf/$DOCKER_USER" -name "conf.sh" -exec /subconf.sh {} \;
 
     # see last.sh
     # shellcheck disable=SC1091
