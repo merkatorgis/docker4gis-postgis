@@ -23,11 +23,6 @@ COPY conf/entrypoint /
 ENTRYPOINT ["/entrypoint"]
 CMD ["postgis"]
 
-# This may come in handy.
-ONBUILD ARG DOCKER_USER
-ONBUILD ENV DOCKER_USER=$DOCKER_USER
-
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 # update the list of installable packages
@@ -235,16 +230,15 @@ RUN [ "$POSTGRESQL_VERSION" -le 11 ] \
     && echo 'hostssl all             all             all                     md5       clientcert=1' >> /etc/postgresql/pg_hba.conf \
     || echo 'hostssl all             all             all                     cert' >> /etc/postgresql/pg_hba.conf
 
-# include a "client" image's conf scripts where onstart.sh will find them
-ONBUILD COPY conf /tmp/conf
-
-
-# Extension template, as required by `dg component`.
-COPY template /template/
-# Make this an extensible base component; see
-# https://github.com/merkatorgis/docker4gis/tree/npm-package/docs#extending-base-components.
+# Make this image work with dg build & dg push.
 COPY conf/.docker4gis /.docker4gis
 COPY build.sh run.sh /.docker4gis/
-ONBUILD COPY conf /tmp/conf
-ONBUILD RUN touch /tmp/conf/args
-ONBUILD RUN cp /tmp/conf/args /.docker4gis/
+
+# This may come in handy.
+ONBUILD ARG DOCKER_USER
+ONBUILD ENV DOCKER_USER=$DOCKER_USER
+
+# Make this an extensible base component; see
+# https://github.com/merkatorgis/docker4gis/tree/npm-package/docs#extending-base-components.
+ONBUILD COPY conf/args /.docker4gis/
+COPY template /template/
