@@ -1,6 +1,6 @@
 # check=skip=SecretsUsedInArgOrEnv
 
-FROM docker4gis/postgis:v0.0.25-17-3.5
+FROM docker4gis/postgis:v0.0.26-17-3.5
 
 ENV POSTFIX_DOMAIN=template.example.com
 
