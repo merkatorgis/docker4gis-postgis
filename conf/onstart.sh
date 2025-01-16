@@ -23,7 +23,7 @@ time {
     update-postgis.sh
 
     extension ogr_fdw
-    extension odbc_fdw
+    [ "$POSTGRESQL_VERSION" -lt 17 ] && extension odbc_fdw
     extension plsh
     extension pgcrypto
     extension pgjwt
@@ -38,8 +38,8 @@ time {
     /subconf.sh /tmp/web/conf.sh
     /subconf.sh /tmp/admin/conf.sh
 
-    # This corresponds to the Dockerfile's COPY conf/$DOCKER_USER /tmp/conf/$DOCKER_USER.
-    find "/tmp/conf/$DOCKER_USER" -name "conf.sh" -exec /subconf.sh {} \;
+    # This corresponds to the Dockerfile's COPY conf/ddl /ddl.
+    /subconf.sh /ddl/conf.sh
 
     # see last.sh
     # shellcheck disable=SC1091

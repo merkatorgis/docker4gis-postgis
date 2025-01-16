@@ -1,5 +1,5 @@
 create table things
-    ( id   serial primary key
+    ( id serial primary key
     , role name not null default current_user
     , what text not null
     , constraint things_role_what_key unique (role, what)

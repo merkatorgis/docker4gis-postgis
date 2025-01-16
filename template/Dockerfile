@@ -14,5 +14,5 @@ RUN addmailbox.sh noreply 'Example.com Template Service'
 # ENV EXCLUDE_SCHEMA=(interpolatie|utils)
 ENV EXCLUDE_SCHEMA=
 
-# On container start, all /tmp/conf/$DOCKER_USER/*/conf.sh scripts are executed.
-COPY conf/$DOCKER_USER /tmp/conf/$DOCKER_USER
+# On container start, /ddl/conf.sh is executed.
+COPY conf/ddl /ddl

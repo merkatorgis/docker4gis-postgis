@@ -2,6 +2,6 @@
 
 conf=$1
 
-pushd $(dirname "${conf}")
-	"${conf}"
-popd
+pushd "$(dirname "$conf")" &&
+	"$conf" &&
+	popd || exit
