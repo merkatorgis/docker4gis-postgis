@@ -18,11 +18,6 @@ FROM postgis/postgis:${POSTGRESQL_VERSION}-${POSTGIS_VERSION}
 ARG POSTGRESQL_VERSION
 ENV POSTGRESQL_VERSION=${POSTGRESQL_VERSION}
 
-# Allow configuration before things start up.
-COPY conf/entrypoint /
-ENTRYPOINT ["/entrypoint"]
-CMD ["postgis"]
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 # update the list of installable packages
@@ -135,34 +130,12 @@ RUN ACCEPT_EULA=Y apt-get install -y mssql-tools; \
 # https://github.com/microsoft/msphpsql/issues/1021
 RUN sed -i 's/CipherString = DEFAULT@SECLEVEL=2/CipherString = DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf
 
-ARG ODBC_FDW_VERSION
-# compile & install odbc_fdw
-ENV ODBC_FDW_VERSION=${ODBC_FDW_VERSION}
-# https://github.com/CartoDB/odbc_fdw/archive/0.5.1.tar.gz
-ADD conf/src/odbc_fdw-${ODBC_FDW_VERSION}.tar.gz /
-# NOTE: odbc_fdw is not compatible with PostgreSQL 17. Project development seems
-# to have stopped (see https://github.com/CartoDB/odbc_fdw). Consider using
-# ogr_fwd instead; see https://gdal.org/en/stable/drivers/vector/odbc.html.
-RUN if [ "$POSTGRESQL_VERSION" -lt 17 ]; then \
-    cd /odbc_fdw-${ODBC_FDW_VERSION}; \
-    make; \
-    make install; \
-    fi
-
 # remove packages used for building several components
 RUN apt remove -y ${BUILD_TOOLS}; \
     apt autoremove -y
 
-ARG MYSQL_VERSION
-# install mysql repository to
-# install package mysql-connector-odbc
-ENV MYSQL_VERSION=${MYSQL_VERSION}
-# https://dev.mysql.com/get/mysql-apt-config_0.8.16-1_all.deb
-COPY conf/src/mysql-apt-config_${MYSQL_VERSION}_all.deb /
-RUN apt install -y lsb-release wget; \
-    dpkg -i /mysql-apt-config_${MYSQL_VERSION}_all.deb; \
-    apt update; \
-    apt install -y mysql-connector-odbc
+# Install the mysql client.
+RUN apt install -y default-mysql-client
 
 # Install the runner plugin.
 COPY conf/.plugins/runner /tmp/runner
@@ -212,15 +185,21 @@ COPY conf/web /tmp/web
 COPY conf/admin /tmp/admin
 
 # install database server administrative scripts
-COPY ["conf/entrypoint", "conf/conf.sh", "conf/onstart.sh", "conf/subconf.sh", "/"]
+COPY ["conf/conf.sh", "conf/onstart.sh", "conf/subconf.sh", "/"]
 
 # install tools
+
 COPY conf/last.sh /usr/local/bin/
+
 COPY conf/dump_restore /usr/local/bin/dump
 COPY conf/dump_restore /usr/local/bin/restore
 COPY conf/dump_restore /usr/local/bin/upgrade
 COPY conf/dump_restore /usr/local/bin/dump_schema
 COPY conf/dump_restore /usr/local/bin/restore_schema
+
+COPY conf/ogr_dummy.json /tmp/conf/
+RUN chown postgres:postgres /tmp/conf/ogr_dummy.json
+COPY conf/fdw /usr/local/bin/
 
 # copy custom postgres configuration files
 COPY conf/postgres /etc/postgresql
@@ -229,6 +208,11 @@ RUN mv "${CONFIG_FILE}" "${CONFIG_FILE}.template"
 RUN [ "$POSTGRESQL_VERSION" -le 11 ] \
     && echo 'hostssl all             all             all                     md5       clientcert=1' >> /etc/postgresql/pg_hba.conf \
     || echo 'hostssl all             all             all                     cert' >> /etc/postgresql/pg_hba.conf
+
+# Allow configuration before things start up.
+COPY conf/entrypoint /
+ENTRYPOINT ["/entrypoint"]
+CMD ["postgis"]
 
 # Make this image work with dg build & dg push.
 COPY conf/.docker4gis /.docker4gis
