@@ -218,9 +218,13 @@ CMD ["postgis"]
 COPY conf/.docker4gis /.docker4gis
 COPY build.sh run.sh /.docker4gis/
 
-# This may come in handy.
+# Set environment variables.
+ONBUILD ARG DOCKER_REGISTRY
+ONBUILD ENV DOCKER_REGISTRY=$DOCKER_REGISTRY
 ONBUILD ARG DOCKER_USER
 ONBUILD ENV DOCKER_USER=$DOCKER_USER
+ONBUILD ARG DOCKER_REPO
+ONBUILD ENV DOCKER_REPO=$DOCKER_REPO
 
 # Make this an extensible base component; see
 # https://github.com/merkatorgis/docker4gis/tree/npm-package/docs#extending-base-components.
