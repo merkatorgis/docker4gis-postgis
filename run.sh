@@ -14,26 +14,26 @@ mkdir -p "$CERTIFICATES"
 mkdir -p "$FILEPORT"
 mkdir -p "$RUNNER"
 
-docker container run --restart "$RESTART" --name "$CONTAINER" \
+docker container run --restart "$RESTART" --name "$DOCKER_CONTAINER" \
 	--env-file "$ENV_FILE" \
 	--env POSTGRES_LOG_STATEMENT="$POSTGRES_LOG_STATEMENT" \
 	--shm-size="$SHM_SIZE" \
 	--mount type=bind,source="$FILEPORT",target=/fileport \
 	--mount type=bind,source="$RUNNER",target=/runner \
 	--mount type=bind,source="$CERTIFICATES",target=/certificates \
-	--mount source="$VOLUME",target=/var/lib/postgresql/data \
-	--network "$NETWORK" \
+	--mount source="$DOCKER_VOLUME",target=/var/lib/postgresql/data \
+	--network "$DOCKER_NETWORK" \
 	--publish "$POSTGIS_PORT":5432 \
-	--detach "$IMAGE" postgis "$@"
+	--detach "$DOCKER_IMAGE" postgis "$@"
 
 # Provision the PGDATABASE variable.
-eval "$(docker container exec "$CONTAINER" env | grep PGDATABASE)"
+eval "$(docker container exec "$DOCKER_CONTAINER" env | grep PGDATABASE)"
 # Wait until all DDL has run.
 sql="alter database $PGDATABASE set app.ddl_done to false"
-docker container exec "$CONTAINER" pg.sh -c "$sql" >/dev/null
+docker container exec "$DOCKER_CONTAINER" pg.sh -c "$sql" >/dev/null
 while
 	sql="select current_setting('app.ddl_done', true)"
-	value=$(docker container exec "$CONTAINER" pg.sh -Atc "$sql")
+	value=$(docker container exec "$DOCKER_CONTAINER" pg.sh -Atc "$sql")
 	[ "$value" != "true" ]
 do
 	sleep 1
