@@ -29,4 +29,4 @@ docker image build \
 	--build-arg PGDATABASE="$PGDATABASE" \
 	--build-arg PGUSER="$PGUSER" \
 	--build-arg PGPASSWORD="$PGPASSWORD" \
-	-t "$IMAGE" .
+	-t "$DOCKER_IMAGE" .
