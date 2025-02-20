@@ -21,9 +21,9 @@ for _ in '-n' '-d'; do
     esac
 done
 
-dir=/fileport/$database
+dir=${1:-/fileport/$database}
 [ "$schema" ] && dir=$dir/$schema
-mkdir -p "$dir"
+mkdir -p "$dir" || exit
 
 roles=$dir/roles
 backup=$dir/backup

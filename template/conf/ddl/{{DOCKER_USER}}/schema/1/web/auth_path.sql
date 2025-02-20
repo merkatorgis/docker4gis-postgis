@@ -1,3 +1,5 @@
+DROP FUNCTION IF EXISTS auth_path
+;
 CREATE OR REPLACE FUNCTION auth_path
     ( "Method" text
     , "Path" text
@@ -15,7 +17,7 @@ begin
 -- Method=%
 -- Path=%
 -- Query=%
--- Body=%&log&, "Method", "Path", "Query", "Body";
+-- Body=%$log$, "Method", "Path", "Query", "Body";
 
     -- Set the "ok" variable to true if all checks pass.
     if 1 = 1 then
@@ -25,7 +27,8 @@ begin
     if not "ok" then
         raise insufficient_privilege;
     end if;
-end $function$;
+end $function$
+;
 
 grant "execute" on function "auth_path"
 to "web_user"
