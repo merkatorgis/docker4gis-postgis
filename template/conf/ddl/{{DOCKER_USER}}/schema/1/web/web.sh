@@ -9,10 +9,12 @@ schema() {
 (
     cd "$(dirname "$0")" &&
         schema -f auth_path.sql &&
+        schema -f cache_path.sql &&
         schema -f new_user.sql &&
         schema -f change_password.sql &&
         schema -f login.sql &&
-        # This one can't be done like the others, since we need to call $SCHEMA.login.
+        # This one can't be done like the others, since we need to call
+        # $SCHEMA.login.
         pg.sh -c "
             create or replace function $SCHEMA.save_password
                 ( email citext
