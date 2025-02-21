@@ -13,9 +13,9 @@ schema() {
         # This one can't be done like the others, since we need to call
         # $SCHEMA.cache_path_result.
         pg.sh -c "
-            DROP FUNCTION IF EXISTS cache_path
+            DROP FUNCTION IF EXISTS $SCHEMA.cache_path
             ;
-            CREATE OR REPLACE FUNCTION cache_path
+            CREATE OR REPLACE FUNCTION $SCHEMA.cache_path
                 ( \"Path\" text
                 , \"Query\" jsonb
                 , \"Header\" jsonb
@@ -45,12 +45,12 @@ schema() {
             end \$function\$
             ;
 
-            grant execute on function cache_path
+            grant execute on function $SCHEMA.cache_path
             to web_user
             , web_anon
             ;
 
-            comment on function cache_path is
+            comment on function $SCHEMA.cache_path is
             \$\$This function is the endpoint for the default value of the CACHE_PATH variable
             (http://$DOCKER_USER-api:8080/rpc/cache_path) in the Proxy component, whith
             PostgREST as the API component.

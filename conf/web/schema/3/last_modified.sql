@@ -24,7 +24,6 @@ end $function$
 ;
 
 comment on function web.last_modified is
-$$
-Converts a timestamp to a string in the format of the Last-Modified header, e.g.
+$$Converts a timestamp to a string in the format of the Last-Modified header, e.g.
 'Wed, 19 Feb 2025 16:40:16 GMT'.
 $$;

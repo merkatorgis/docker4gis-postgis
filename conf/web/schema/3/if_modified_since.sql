@@ -21,7 +21,7 @@ as $function$
 $function$
 ;
 
-comment on function web.if_modified_since is $$
-Converts the value of the If-Modified-Since header, e.g.
+comment on function web.if_modified_since is
+$$Converts the value of the If-Modified-Since header, e.g.
 'Wed, 19 Feb 2025 16:40:16 GMT', to a timestamp.
 $$;
