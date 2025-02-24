@@ -120,8 +120,8 @@ $$;
 drop function if exists public.web_cache_path_result
 ;
 create or replace function public.web_cache_path_result
-    ( p_header jsonb
-    , p_last_modified timestamptz
+    ( p_header jsonb default null::jsonb
+    , p_last_modified timestamptz default '1900-01-01'::timestamptz
     , p_max_age integer default 0
     )
 returns jsonb
@@ -134,21 +134,39 @@ declare
     v_header jsonb;
     v_max_age text := 'no-cache';
 begin
+    -- Truncate to seconds to prevent false differences in the comparison with
+    -- v_if_modified_since.
+    p_last_modified := date_trunc
+        ( 'second'
+        , p_last_modified
+        );
+
+    -- Set v_stale to false if not stale.
     if v_if_modified_since is not null then
         v_stale := p_last_modified > v_if_modified_since;
     end if;
 
+    -- Format the max-age part of the Cache-Control header.
     if p_max_age > 0 then
         v_max_age := 'max-age=' || p_max_age;
     end if;
 
-    v_header := public.web_last_modified("p_last_modified") || jsonb_build_object
-        ( 'Cache-Control', array[format('private, %s, immutable', v_max_age)]
-        );
+    -- Enable calling web_cache_path_result() without parameters to render a
+    -- "stale" result with no header.
+    if p_header is not null then
+        -- Render a possibly non-stale result with the proper header values.
+        v_header := public.web_last_modified
+            ( p_last_modified
+            ) ||
+            jsonb_build_object
+                ( 'Cache-Control'
+                , array[format('private, %s, immutable', v_max_age)]
+                );
+    end if;
 
     return jsonb_build_object
-        ( 'Header', v_header
-        , 'Stale', v_stale
+        ( 'Stale', v_stale
+        , 'Header', v_header
         );
 end $function$
 ;
