@@ -121,7 +121,7 @@ drop function if exists public.web_cache_path_result
 ;
 create or replace function public.web_cache_path_result
     ( p_header jsonb default null::jsonb
-    , p_last_modified timestamptz default '1900-01-01'::timestamptz
+    , p_last_modified timestamptz default null::timestamptz
     , p_max_age integer default 0
     )
 returns jsonb
@@ -138,7 +138,10 @@ begin
     -- v_if_modified_since.
     p_last_modified := date_trunc
         ( 'second'
-        , p_last_modified
+        , coalesce
+            ( p_last_modified
+            , '1900-01-01'::timestamptz
+            )
         );
 
     -- Set v_stale to false if not stale.
