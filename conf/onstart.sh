@@ -38,7 +38,9 @@ time {
     /subconf.sh /tmp/web/conf.sh
     /subconf.sh /tmp/admin/conf.sh
 
-    # This corresponds to the Dockerfile's COPY conf/ddl /ddl.
+    pg.sh -f /public.sql
+
+    # This corresponds to the template's Dockerfile's COPY conf/ddl /ddl.
     /subconf.sh /ddl/conf.sh
 
     # see last.sh
