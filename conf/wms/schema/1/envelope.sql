@@ -1,3 +1,7 @@
+grant usage on schema wms
+to public
+;
+
 -- See https://docs.geoserver.org/main/en/user/data/database/sqlsession.html.
 
 -- select set_config
@@ -5,10 +9,11 @@
 --     , '${envelope, -180,-90,180,90,4326}'
 --     , false
 --     );
-drop function if exists public.wms_envelope
+drop function if exists wms.envelope
 ;
-create or replace function public.wms_envelope
+create or replace function wms.envelope
   ( p_srid integer
+  , p_envelope text default current_setting('wms.envelope')
   )
 returns geometry
 language plpgsql
@@ -16,7 +21,7 @@ stable
 as $function$
 declare
   v_parts text[] := string_to_array
-    ( current_setting('wms.envelope')
+    ( p_envelope
     , ','
     );
 begin
@@ -32,6 +37,6 @@ begin
     );
 end $function$;
 
-grant execute on function public.wms_envelope
+grant execute on function wms.envelope
 to public
 ;
