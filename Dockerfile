@@ -185,7 +185,7 @@ COPY conf/web /tmp/web
 COPY conf/admin /tmp/admin
 
 # install database server administrative scripts
-COPY ["conf/conf.sh", "conf/onstart.sh", "conf/subconf.sh", "/"]
+COPY ["conf/conf.sh", "conf/onstart.sh", "conf/subconf.sh", "conf/public.sql", "/"]
 
 # install tools
 
