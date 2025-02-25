@@ -184,8 +184,11 @@ COPY conf/web /tmp/web
 # install source for schema admin
 COPY conf/admin /tmp/admin
 
+# install source for schema wms
+COPY conf/wms /tmp/wms
+
 # install database server administrative scripts
-COPY ["conf/conf.sh", "conf/onstart.sh", "conf/subconf.sh", "conf/public.sql", "/"]
+COPY ["conf/conf.sh", "conf/onstart.sh", "conf/subconf.sh", "/"]
 
 # install tools
 
