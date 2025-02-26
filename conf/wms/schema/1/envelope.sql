@@ -2,14 +2,7 @@ grant usage on schema wms
 to public
 ;
 
--- See https://docs.geoserver.org/main/en/user/data/database/sqlsession.html.
-
--- select set_config
---     ( 'wms.envelope'
---     , '${envelope, -180,-90,180,90,4326}'
---     , false
---     );
-drop function if exists wms.envelope
+drop function if exists wms.envelope(integer, text)
 ;
 create or replace function wms.envelope
   ( p_srid integer
@@ -37,6 +30,11 @@ begin
     );
 end $function$;
 
-grant execute on function wms.envelope
+grant execute on function wms.envelope(integer, text)
 to public
 ;
+
+comment on function wms.envelope(integer, text) is
+$$Create a box geometry in the given SRID from the 'wms.envelope' setting, or an
+ad hoc envelope string.
+$$;
