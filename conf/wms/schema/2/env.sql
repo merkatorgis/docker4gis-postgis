@@ -11,16 +11,15 @@ create or replace function wms.env
   , p_value text
   )
 returns void
-language plpgsql
+language sql
 immutable
 as $function$
-begin
-  perform set_config
+  select set_config
       ( 'wms.' || lower(p_key)
       , p_value
       , false
-      );
-end $function$;
+      )
+$function$;
 
 grant execute on function wms.env(text, text)
 to public
@@ -37,18 +36,20 @@ create or replace function wms.envelope
   ( p_envelope text
   )
 returns void
-language plpgsql
+language sql
 immutable
 as $function$
-begin
-  if p_envelope is null or p_envelope = '' then
-    p_envelope := '-180,-90,180,90,4326';
-  end if;
-  perform wms.env
+  select wms.env
     ( 'envelope'
-    , p_envelope
-    );
-end $function$;
+    , coalesce
+      ( nullif
+        ( p_envelope
+        , ''
+        )
+      , '-180,-90,180,90,4326'
+      )
+    )
+$function$;
 
 grant execute on function wms.envelope(text)
 to public
@@ -133,7 +134,7 @@ create or replace function wms.envelope
   )
 returns geometry
 language sql
-stable
+immutable
 as $function$
   select wms.envelope
       ( p_srid
