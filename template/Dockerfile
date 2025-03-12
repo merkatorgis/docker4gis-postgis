@@ -13,5 +13,9 @@ RUN addmailbox.sh noreply 'Example.com Template Service'
 # https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-PATTERNS.
 ENV EXCLUDE_SCHEMA=(tiger|tiger_data|topology)
 
+# Optionally include dump files in this directory to kickstart an empty database
+# instead of fully building it from the ddl scripts.
+COPY conf/snapshot /snapshot
+
 # On container start, /ddl/conf.sh is executed.
 COPY conf/ddl /ddl
