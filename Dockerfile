@@ -177,27 +177,10 @@ ONBUILD ENV POSTGRES_DB=${PGDATABASE}
 COPY conf/.plugins/bats /tmp/.plugins/bats
 RUN /tmp/.plugins/bats/install.sh
 
-# install tool schema.sh
-COPY conf/schema.sh /usr/local/bin
-
-# install source for schema mail
-COPY conf/mail /tmp/mail
-
-# install source for schema web
-COPY conf/web /tmp/web
-
-# install source for schema admin
-COPY conf/admin /tmp/admin
-
-# install source for schema wms
-COPY conf/wms /tmp/wms
-
 # install database server administrative scripts
 COPY ["conf/conf.sh", "conf/onstart.sh", "conf/subconf.sh", "/"]
 
 # install tools
-
-COPY conf/last.sh /usr/local/bin/
 
 COPY conf/dump_restore /usr/local/bin/dump
 COPY conf/dump_restore /usr/local/bin/restore

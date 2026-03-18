@@ -35,21 +35,6 @@ time {
     [ "$POSTGRESQL_VERSION" -lt 14 ] && extension range_agg
     [ "$DOCKER_ENV" = DEVELOPMENT ] || [ "$DOCKER_ENV" = DEV ] && extension pldbgapi
 
-    # clear the "last" file (see last.sh)
-    echo '' >/last
-
-    /subconf.sh /tmp/mail/conf.sh
-    /subconf.sh /tmp/web/conf.sh
-    /subconf.sh /tmp/admin/conf.sh
-    /subconf.sh /tmp/wms/conf.sh
-
-    # This corresponds to the template's Dockerfile's COPY conf/ddl /ddl.
-    /subconf.sh /ddl/conf.sh
-
-    # see last.sh
-    # shellcheck disable=SC1091
-    source /last
-
     echo
     echo "Available ODBC drivers:"
     odbcinst -q -d
@@ -60,6 +45,3 @@ time {
 # to prevent issues with restoring a dump file, this is deliberately _not_
 # loaded in shared_preload_libraries
 pg.sh -c "alter database $PGDATABASE set session_preload_libraries = 'safeupdate'"
-
-# run.sh waits until this is true
-pg.sh -c "alter database $PGDATABASE set app.ddl_done to true"
