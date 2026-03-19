@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# https://docs.postgrest.org/en/v14/explanations/db_authz.html#functions: By
+# default, when a function is created, the privilege to execute it is not
+# restricted by role. The function access is PUBLIC — executable by all roles
+# (more details at PostgreSQL Privileges page). To disable this behavior, you
+# can run the following SQL statement:
+pg.sh -c "ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC"
+
 extension() {
     pg.sh -c "create extension if not exists $1"
 }
@@ -35,21 +42,6 @@ time {
     [ "$POSTGRESQL_VERSION" -lt 14 ] && extension range_agg
     [ "$DOCKER_ENV" = DEVELOPMENT ] || [ "$DOCKER_ENV" = DEV ] && extension pldbgapi
 
-    # clear the "last" file (see last.sh)
-    echo '' >/last
-
-    /subconf.sh /tmp/mail/conf.sh
-    /subconf.sh /tmp/web/conf.sh
-    /subconf.sh /tmp/admin/conf.sh
-    /subconf.sh /tmp/wms/conf.sh
-
-    # This corresponds to the template's Dockerfile's COPY conf/ddl /ddl.
-    /subconf.sh /ddl/conf.sh
-
-    # see last.sh
-    # shellcheck disable=SC1091
-    source /last
-
     echo
     echo "Available ODBC drivers:"
     odbcinst -q -d
@@ -61,5 +53,5 @@ time {
 # loaded in shared_preload_libraries
 pg.sh -c "alter database $PGDATABASE set session_preload_libraries = 'safeupdate'"
 
-# run.sh waits until this is true
-pg.sh -c "alter database $PGDATABASE set app.ddl_done to true"
+# Signal that the database is ready for use.
+pg.sh -c "alter database $PGDATABASE set db.ready to true"

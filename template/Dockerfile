@@ -17,5 +17,3 @@ ENV EXCLUDE_SCHEMA=(tiger|tiger_data|topology)
 # instead of fully building it from the ddl scripts.
 COPY conf/snapshot /snapshot
 
-# On container start, /ddl/conf.sh is executed.
-COPY conf/ddl /ddl
