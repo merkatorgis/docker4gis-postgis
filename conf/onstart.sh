@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# https://docs.postgrest.org/en/v14/explanations/db_authz.html#functions: By
+# default, when a function is created, the privilege to execute it is not
+# restricted by role. The function access is PUBLIC — executable by all roles
+# (more details at PostgreSQL Privileges page). To disable this behavior, you
+# can run the following SQL statement:
+pg.sh -c "ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC"
+
 extension() {
     pg.sh -c "create extension if not exists $1"
 }
@@ -45,3 +52,6 @@ time {
 # to prevent issues with restoring a dump file, this is deliberately _not_
 # loaded in shared_preload_libraries
 pg.sh -c "alter database $PGDATABASE set session_preload_libraries = 'safeupdate'"
+
+# Signal that the database is ready for use.
+pg.sh -c "alter database $PGDATABASE set db.ready to true"
